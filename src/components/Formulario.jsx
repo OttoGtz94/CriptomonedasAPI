@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import useMoneda from '../hooks/useMoneda';
 import useCriptomoneda from '../hooks/useCriptomoneda';
 import axios from 'axios';
+import Error from './Error';
 
 const Boton = styled.input`
 	margin-top: 20px;
@@ -21,9 +22,13 @@ const Boton = styled.input`
 	}
 `;
 
-const Formulario = () => {
+const Formulario = ({
+	guardarMoneda,
+	guardarCriptomoneda,
+}) => {
 	// state de listado de criptomonedas
 	const [listacripto, guardarCriptomonedas] = useState([]);
+	const [error, guardarError] = useState(false);
 
 	const MONEDAS = [
 		{ codigo: 'USD', nombre: 'Dolar Americano' },
@@ -53,9 +58,24 @@ const Formulario = () => {
 		};
 		consultarAPI();
 	}, []);
+	const cotizarMoneda = e => {
+		e.preventDefault();
+
+		if (moneda === '' || criptomoneda === '') {
+			guardarError(true);
+			return;
+		}
+
+		guardarError(false);
+		guardarMoneda(moneda);
+		guardarCriptomoneda(criptomoneda);
+	};
 
 	return (
-		<form>
+		<form onSubmit={cotizarMoneda}>
+			{error ? (
+				<Error mensaje='Todos los campos son obligatorios' />
+			) : null}
 			<SelectMonedas />
 			<SelectCripto />
 			<Boton type='submit' values='Calcular' />
